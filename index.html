@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>课堂互动钟表 · 教学演示</title>
+<title>What time is it?</title>
 <style>
   /* ==================== 基础重置 ==================== */
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -13,34 +13,33 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /* 🌟 换了温和的奶油米黄色背景 */
     background-color: #FFF9F0;
-    /* 🌟 加上童趣的淡色波点 */
     background-image: radial-gradient(#FFE4C4 1.5px, transparent 1.5px);
     background-size: 30px 30px;
     font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
     color: #333;
     overflow: hidden;
-    user-select: none; /* 防止拖拽时选中文本 */
+    user-select: none;
   }
 
-  /* ==================== 顶部信息 ==================== */
+  /* ==================== 顶部标题 ==================== */
   .header {
-    font-size: 26px;
-    font-weight: 800;
-    color: #8B7E74; /* 温和的暖灰色 */
-    margin-bottom: 25px;
-    letter-spacing: 3px;
+    font-size: 40px;
+    font-weight: 900;
+    color: #F08C00; /* 活泼的橙色 */
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    font-family: "Arial Rounded MT Bold", "PingFang SC", sans-serif;
+    text-shadow: 2px 2px 0px #FFF, 4px 4px 0px rgba(240,140,0,0.1);
   }
 
   /* ==================== 钟表区域 ==================== */
   .clock-container {
     position: relative;
-    width: 520px;
-    height: 520px;
+    width: 460px;
+    height: 460px;
     background: #fff;
     border-radius: 50%;
-    /* 柔和的外发光和立体边框 */
     box-shadow: 0 20px 50px rgba(200, 170, 150, 0.2), 
                 inset 0 0 0 12px #FFF6EE, 
                 inset 0 0 0 14px #FFE8D6;
@@ -48,127 +47,154 @@
     align-items: center;
     justify-content: center;
     cursor: grab;
-    transition: transform 0.3s ease;
   }
-  .clock-container:active {
-    cursor: grabbing;
-  }
+  .clock-container:active { cursor: grabbing; }
 
-  /* SVG 画布 */
-  svg {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
+  svg { width: 100%; height: 100%; display: block; }
 
-  /* 指针拖动时的交互区 (加粗透明层，方便捕捉拖拽) */
   .interactive-hand {
     stroke: transparent;
     stroke-width: 45;
     cursor: grab;
   }
-  .interactive-hand:active {
-    cursor: grabbing;
-  }
+  .interactive-hand:active { cursor: grabbing; }
 
-  /* 静态的指针样式 */
   .hour-hand-visual {
-    stroke: #5C5C5C; /* 温和的深灰色时针 */
+    stroke: #5C5C5C;
     stroke-width: 14;
     stroke-linecap: round;
   }
   .minute-hand-visual {
-    stroke: #FFA94D; /* 活泼的橙色分针 */
+    stroke: #FFA94D;
     stroke-width: 9;
     stroke-linecap: round;
   }
-  .center-pin {
-    fill: #5C5C5C;
-  }
-  .center-pin-inner {
-    fill: #fff;
-  }
+  .center-pin { fill: #5C5C5C; }
+  .center-pin-inner { fill: #fff; }
 
   /* ==================== 底部时间显示 ==================== */
   .display-panel {
-    margin-top: 45px; /* 因为删了按钮，往下移一点，视觉更平衡 */
+    margin-top: 30px;
     display: flex;
-    gap: 24px;
+    gap: 20px;
     align-items: center;
     justify-content: center;
-    width: 100%;
+    height: 100px; /* 固定高度，防止显示/隐藏时布局跳动 */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  
+  .display-panel.show {
+    opacity: 1;
   }
   
   .digital-time {
-    font-size: 60px;
+    font-size: 56px;
     font-weight: 900;
     color: #5C5C5C;
     font-variant-numeric: tabular-nums;
-    min-width: 200px;
+    min-width: 180px;
     text-align: center;
     letter-spacing: 2px;
     background: #fff;
-    padding: 12px 30px;
+    padding: 10px 30px;
     border-radius: 24px;
     box-shadow: 0 8px 24px rgba(200, 170, 150, 0.15);
   }
 
   .english-time {
-    font-size: 36px;
+    font-size: 34px;
     font-weight: 800;
-    color: #E67700; /* 和分针呼应的深橙色 */
-    min-width: 340px;
+    color: #E67700;
+    min-width: 300px;
     text-align: left;
-    background: #FFF4E6; /* 暖色调背景 */
+    background: #FFF4E6;
     padding: 16px 36px;
     border-radius: 24px;
     box-shadow: 0 8px 24px rgba(255, 169, 77, 0.15);
     font-family: "Arial Rounded MT Bold", "PingFang SC", sans-serif;
   }
 
+  /* ==================== 按钮控制区 ==================== */
+  .controls {
+    margin-top: 20px;
+    display: flex;
+    gap: 16px;
+  }
+  
+  .btn {
+    padding: 14px 32px;
+    font-size: 22px;
+    font-weight: 800;
+    border: none;
+    border-radius: 999px;
+    background: #fff;
+    color: #5C5C5C;
+    box-shadow: 0 6px 0 #F0E5D8, 0 10px 20px rgba(200,170,150,0.1);
+    cursor: pointer;
+    transition: all 0.1s;
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #F0E5D8, 0 12px 20px rgba(200,170,150,0.15); }
+  .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #F0E5D8; }
+  
+  /* 显示答案按钮特调颜色 */
+  .btn-show {
+    background: #FFA94D;
+    color: #fff;
+    box-shadow: 0 6px 0 #D97706, 0 10px 20px rgba(255,169,77,0.3);
+  }
+  .btn-show:hover { box-shadow: 0 8px 0 #D97706, 0 12px 20px rgba(255,169,77,0.4); }
+  .btn-show:active { box-shadow: 0 2px 0 #D97706; }
+  
 </style>
 </head>
 <body>
 
-<div class="header">⏰ 互动教学钟表</div>
+<div class="header">What time is it?</div>
 
 <div class="clock-container" id="clockContainer">
   <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-    <!-- 表盘内圈背景 -->
     <circle cx="250" cy="250" r="230" fill="#FFF" />
-    
-    <!-- 刻度线和数字由 JS 动态生成 -->
     <g id="ticksAndNumbers"></g>
     
-    <!-- 时针 (长度 110) -->
+    <!-- 时针 -->
     <g id="hourHand">
       <line id="hourVisual" x1="250" y1="250" x2="250" y2="140" class="hour-hand-visual" />
       <line id="hourInteractive" x1="250" y1="250" x2="250" y2="140" class="interactive-hand" />
     </g>
     
-    <!-- 分针 (长度 180) -->
+    <!-- 分针 -->
     <g id="minuteHand">
       <line id="minuteVisual" x1="250" y1="250" x2="250" y2="70" class="minute-hand-visual" />
       <line id="minuteInteractive" x1="250" y1="250" x2="250" y2="70" class="interactive-hand" />
     </g>
     
-    <!-- 中心轴 -->
     <circle cx="250" cy="250" r="18" class="center-pin" />
     <circle cx="250" cy="250" r="8" class="center-pin-inner" />
   </svg>
 </div>
 
-<div class="display-panel">
-  <!-- 左侧显示纯数字格式，方便一眼看清 -->
-  <div class="digital-time" id="digitalTime">3:00</div>
-  <!-- 右侧显示要求的英文格式 -->
-  <div class="english-time" id="englishTime">It's 3 o'clock</div>
+<!-- 初始隐藏 (.display-panel 不带 show 类) -->
+<div class="display-panel" id="displayPanel">
+  <div class="digital-time" id="digitalTime">12:00</div>
+  <div class="english-time" id="englishTime">It's 12 o'clock</div>
+</div>
+
+<div class="controls">
+  <button class="btn" onclick="generateTime('hour')">整点</button>
+  <button class="btn" onclick="generateTime('half')">半点</button>
+  <button class="btn" onclick="generateTime('random')">随机</button>
+  <button class="btn btn-show" onclick="toggleAnswer()">显示答案</button>
 </div>
 
 <script>
 /* ==================== 状态数据 ==================== */
-let currentHour = 3;
-let currentMinute = 0;
+let currentHour = 9;
+let currentMinute = 41;
+let isAnswerVisible = false;
 
 const container = document.getElementById('clockContainer');
 const hourVisual = document.getElementById('hourVisual');
@@ -177,53 +203,48 @@ const minuteVisual = document.getElementById('minuteVisual');
 const minuteInteractive = document.getElementById('minuteInteractive');
 const digitalTimeEl = document.getElementById('digitalTime');
 const englishTimeEl = document.getElementById('englishTime');
+const displayPanel = document.getElementById('displayPanel');
 
-/* ==================== 初始化表盘 (刻度与数字) ==================== */
+/* ==================== 初始化表盘 ==================== */
 function initClockFace() {
   const group = document.getElementById('ticksAndNumbers');
   const cx = 250, cy = 250;
-  
   let html = '';
+  
+  // 刻度
   for (let i = 0; i < 60; i++) {
     const angle = i * 6 * Math.PI / 180;
     const isHour = i % 5 === 0;
-    
     const r1 = isHour ? 200 : 210;
     const r2 = 220;
-    
     const x1 = cx + r1 * Math.sin(angle);
     const y1 = cy - r1 * Math.cos(angle);
     const x2 = cx + r2 * Math.sin(angle);
     const y2 = cy - r2 * Math.cos(angle);
-    
     const strokeW = isHour ? 6 : 3;
-    const color = isHour ? '#B0A8A0' : '#E0D8D0'; /* 刻度线改成暖灰色 */
-    
+    const color = isHour ? '#B0A8A0' : '#E0D8D0';
     html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${strokeW}" stroke-linecap="round" />`;
   }
   
+  // 数字
   const numbers = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
   numbers.forEach((num, i) => {
     const angle = i * 30 * Math.PI / 180;
     const r = 175;
     const x = cx + r * Math.sin(angle);
     const y = cy - r * Math.cos(angle) + 15; 
-    
-    /* 数字颜色也改成柔和的深灰色 */
     html += `<text x="${x}" y="${y}" text-anchor="middle" font-size="42" font-family="Arial, sans-serif" font-weight="900" fill="#7A7268">${num}</text>`;
   });
-  
   group.innerHTML = html;
 }
 
-/* ==================== 渲染时间与指针 ==================== */
+/* ==================== 渲染与显示控制 ==================== */
 function renderClock() {
   const minuteAngle = currentMinute * 6;
   const hourAngle = (currentHour % 12) * 30 + (currentMinute / 60) * 30;
 
   hourVisual.setAttribute('transform', `rotate(${hourAngle} 250 250)`);
   hourInteractive.setAttribute('transform', `rotate(${hourAngle} 250 250)`);
-  
   minuteVisual.setAttribute('transform', `rotate(${minuteAngle} 250 250)`);
   minuteInteractive.setAttribute('transform', `rotate(${minuteAngle} 250 250)`);
 
@@ -231,15 +252,47 @@ function renderClock() {
   if (displayHour === 0) displayHour = 12;
   const mm = currentMinute.toString().padStart(2, '0');
   
-  // 左侧数字显示
   digitalTimeEl.textContent = `${displayHour}:${mm}`;
-
-  // 右侧英文显示
   if (currentMinute === 0) {
     englishTimeEl.textContent = `It's ${displayHour} o'clock`;
   } else {
     englishTimeEl.textContent = `It's ${displayHour}:${mm}`;
   }
+}
+
+// 切换答案显示状态
+function toggleAnswer() {
+  isAnswerVisible = !isAnswerVisible;
+  if (isAnswerVisible) {
+    displayPanel.classList.add('show');
+  } else {
+    displayPanel.classList.remove('show');
+  }
+}
+
+// 隐藏答案（用于拖拽和生成新题时重置）
+function hideAnswer() {
+  isAnswerVisible = false;
+  displayPanel.classList.remove('show');
+}
+
+/* ==================== 随机生成时间 ==================== */
+function generateTime(type) {
+  hideAnswer(); // 每次换题先隐藏答案
+  
+  // 生成小时 (1-12)
+  currentHour = Math.floor(Math.random() * 12) + 1;
+  
+  if (type === 'hour') {
+    currentMinute = 0;
+  } else if (type === 'half') {
+    currentMinute = 30;
+  } else {
+    // 随机，为了在表盘上看起来明显，按5分钟间隔随机
+    currentMinute = Math.floor(Math.random() * 12) * 5;
+  }
+  
+  renderClock();
 }
 
 /* ==================== 拖拽交互逻辑 ==================== */
@@ -250,10 +303,8 @@ function getAngle(clientX, clientY) {
   const rect = container.getBoundingClientRect();
   const centerX = rect.left + rect.width / 2;
   const centerY = rect.top + rect.height / 2;
-  
   const x = clientX - centerX;
   const y = clientY - centerY;
-  
   let angle = Math.atan2(y, x) * 180 / Math.PI; 
   angle = angle + 90; 
   if (angle < 0) angle += 360;
@@ -261,8 +312,7 @@ function getAngle(clientX, clientY) {
 }
 
 function handleDown(e) {
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  hideAnswer(); // 只要开始拖拽，就隐藏答案
   
   if (e.target === hourInteractive) {
     isDraggingHour = true;
@@ -277,7 +327,6 @@ function handleMove(e) {
 
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
   const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
   const angle = getAngle(clientX, clientY);
 
   if (isDraggingMinute) {
@@ -301,11 +350,9 @@ function handleMove(e) {
       newHour += 1;
       newMinute = 0;
     }
-    
     currentHour = newHour % 12;
     currentMinute = newMinute;
   }
-
   renderClock();
 }
 
@@ -317,14 +364,13 @@ function handleUp() {
 container.addEventListener('mousedown', handleDown);
 window.addEventListener('mousemove', handleMove);
 window.addEventListener('mouseup', handleUp);
-
 container.addEventListener('touchstart', handleDown, { passive: false });
 window.addEventListener('touchmove', handleMove, { passive: false });
 window.addEventListener('touchend', handleUp);
 
 /* ==================== 启动 ==================== */
 initClockFace();
-renderClock(); // 初始显示 3:00
+renderClock(); // 初始随便给个时间
 </script>
 </body>
 </html>
